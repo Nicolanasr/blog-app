@@ -1,0 +1,92 @@
+from django.shortcuts import render, redirect
+from django.http import HttpResponse
+from django.contrib.auth.forms import UserCreationForm, PasswordChangeForm
+from django.contrib import messages
+from .forms import CreateUserForm, ChangeUserForm
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
+
+
+def account(request):
+    errors = []
+    if not request.user.is_authenticated:
+        return redirect('authentication:login')
+    if request.method == "POST":
+        form = ChangeUserForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+        else:
+            err = form.errors.values()
+            errors = list(err)
+            print(errors)
+            messages.error(request, errors[0])
+            return redirect('authentication:account')
+    form = ChangeUserForm(instance=request.user)
+    ctx = {'form': form}
+    return render(request, 'authentication/account.html', ctx)
+
+
+# user registration views
+def registration(request):
+    if request.user.is_authenticated:
+        messages.warning(request, "User already logged in!")
+        return redirect('authentication:account')
+    form = CreateUserForm()
+    ctx = {'form': form}
+    if request.method == 'POST':
+        form = CreateUserForm(request.POST)
+        if form.is_valid():
+            username = request.POST.get('username')
+            password = request.POST.get('password1')
+            form.save()
+            user = authenticate(request, username=username, password=password)
+            if user is not None:
+                login(request, user)
+            messages.success(request, "Account created successfully!")
+            return redirect('index:index')
+        else:
+            err = form.errors.values()
+            errors = list(err)
+            ctx = {'form': form, 'errors': errors}
+    return render(request, 'authentication/registration.html', ctx)
+
+
+# user login views
+def login_page(request):
+    if request.user.is_authenticated:
+        messages.warning(request, "User already logged in!")
+        return redirect('authentication:account')
+    if request.method == "POST":
+        username = request.POST.get('username')
+        password = request.POST.get('password')
+        user = authenticate(request, username=username, password=password)
+        if user is not None:
+            login(request, user)
+            messages.success(request, "Logged in successfully!")
+            return redirect('index:index')
+        else:
+            messages.warning(request, 'Username or Password are incorrect')
+
+    return render(request, 'authentication/login.html')
+
+
+def logout_page(request):
+    logout(request)
+    return redirect('authentication:register')
+
+
+def change_password(request):
+    form = PasswordChangeForm(request.user)
+    ctx = {'form': form}
+    if request.method == 'POST':
+        form = PasswordChangeForm(request.user, request.POST)
+        if form.is_valid():
+            user = form.save()
+            update_session_auth_hash(request, user)
+            messages.success(request, 'Your password was successfully updated!')
+        else:
+            err = form.errors.values()
+            errors = list(err)
+            ctx = {'form': form, 'errors': errors}
+            messages.error(request, errors[0])
+
+    return render(request, 'authentication/change_password.html', ctx)

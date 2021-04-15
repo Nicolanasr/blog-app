@@ -1,0 +1,135 @@
+{% extends 'index/base.html' %}
+{% block title %} Register {% endblock %}
+
+{% block body %}
+
+
+<div class="container">
+    <div class="row py-5 mt-4 align-items-center">
+        <!-- For Demo Purpose -->
+        <div class="col-md-5 pr-lg-5 mb-5 mb-md-0">
+            <img src="https://res.cloudinary.com/mhmd/image/upload/v1569543678/form_d9sh6m.svg" alt="" class="img-fluid mb-3 d-none d-md-block">
+            <h1>Create an Account</h1>
+<!--            <p class="font-italic text-muted mb-0">Create a minimal registeration page using Bootstrap 4 HTML form elements.</p>-->
+            <p class="font-italic text-muted">Snippet By <a href="https://bootstrapious.com" class="text-muted">
+                <u>Bootstrapious</u></a>
+            </p>
+        </div>
+
+        <!-- Registeration Form -->
+        <div class="col-md-7 col-lg-6 ml-auto">
+            <!--display error messages-->
+            {% for e in errors %}
+			    {{ e }}
+			{% endfor %}
+            <form action="" method = "POST">
+                {% csrf_token %}
+                <div class="row">
+
+                    <!-- First Name -->
+                    <div class="input-group col-lg-6 mb-4">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text bg-white px-4 border-md border-right-0 h-100">
+                                <i class="fa fa-user text-muted"></i>
+                            </span>
+                        </div>
+<!--                        <input id="firstName" type="text" name="firstname" placeholder="First Name" class="form-control bg-white border-left-0 border-md">-->
+                        {{ form.first_name }}
+                    </div>
+
+                    <!-- Last Name -->
+                    <div class="input-group col-lg-6 mb-4">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text bg-white px-4 border-md border-right-0 h-100">
+                                <i class="fa fa-user text-muted"></i>
+                            </span>
+                        </div>
+<!--                        <input id="lastName" type="text" name="lastname" placeholder="Last Name" class="form-control bg-white border-left-0 border-md">-->
+                        {{ form.last_name }}
+                    </div>
+
+                    <div class="input-group col-lg-6 mb-4">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text bg-white px-4 border-md border-right-0 h-100">
+                                <i class="fa fa-user text-muted"></i>
+                            </span>
+                        </div>
+<!--                        <input id="username" type="text" name="username" placeholder="username" class="form-control bg-white border-left-0 border-md">-->
+                        {{ form.username }}
+                    </div>
+
+                    <!-- Email Address -->
+                    <div class="input-group col-lg-12 mb-4">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text bg-white px-4 border-md border-right-0 h-100">
+                                <i class="fa fa-envelope text-muted"></i>
+                            </span>
+                        </div>
+<!--                        <input id="email" type="email" name="email" placeholder="Email Address" class="form-control bg-white border-left-0 border-md">-->
+                        {{ form.email }}
+                    </div>
+
+                    <!-- Password -->
+                    <div class="input-group col-lg-6 mb-4">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text bg-white px-4 border-md border-right-0 h-100">
+                                <i class="fa fa-lock text-muted"></i>
+                            </span>
+                        </div>
+<!--                        <input id="password" type="password" name="password" placeholder="Password" class="form-control bg-white border-left-0 border-md">-->
+                        {{ form.password1 }}
+                    </div>
+
+                    <!-- Password Confirmation -->
+                    <div class="input-group col-lg-6 mb-4">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text bg-white px-4 border-md border-right-0 h-100">
+                                <i class="fa fa-lock text-muted"></i>
+                            </span>
+                        </div>
+<!--                        <input id="passwordConfirmation" type="text" name="passwordConfirmation" placeholder="Confirm Password" class="form-control bg-white border-left-0 border-md">-->
+                        {{ form.password2 }}
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div class="form-group col-lg-12 mx-auto mb-0">
+                        <button type="submit" href="#" class="btn btn-primary btn-block py-2 w-100 ">
+                            <span class="font-weight-bold">Create your account</span>
+                        </button>
+                    </div>
+
+                    <!-- Divider Text -->
+                    <div class="form-group col-lg-12 mx-auto d-flex align-items-center my-4">
+                        <div class="border-bottom w-100 ml-5"></div>
+                        <span class="px-2 small text-muted font-weight-bold text-muted">OR</span>
+                        <div class="border-bottom w-100 mr-5"></div>
+                    </div>
+
+                    <!-- Create new account -->
+                    <div class="text-center w-100">
+                        <p class="text-muted font-weight-bold">Already Registered? <a href="{% url 'authentication:login' %}" class="text-primary ml-2">Login</a></p>
+                    </div>
+
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    error = document.getElementsByClassName('errorlist')
+    inputs = document.getElementsByTagName('input')
+
+    place_holders = ["", "First name", "Last name", "Username", "E-mail address", "Password", "Re-enter password"]
+
+    for(var i = 0; i < error.length; i++) {
+        error[i].className += " alert alert-danger"
+        error[i].style.listStyle = "None"
+    }
+
+    for(var i = 0; i < inputs.length; i++) {
+        inputs[i].className = "form-control bg-white border-left-0 border-md";
+        inputs[i].placeholder = place_holders[i];
+    }
+</script>
+{% endblock %}
