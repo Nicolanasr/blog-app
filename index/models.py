@@ -13,15 +13,23 @@ class Tags(models.Model):
 
 # Post model
 class Post(models.Model):
+    class Meta:
+        ordering = ['-created_at']
+
     def __str__(self):
         return self.title
-    title = models.TextField(max_length=200, null=False, blank=False)
+
+    title = models.TextField(max_length=200, null=True, blank=True)
     author = models.ForeignKey(Profile, on_delete=models.SET_NULL, null=True, blank=True)
-    content = models.TextField(null=False, blank=False)
+    content = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     likes = models.IntegerField(default=0)
     tags = models.ManyToManyField(Tags)
-    thumbnail = models.URLField(null=False, blank=False)
+    thumbnail = models.URLField(null=True, blank=True)
+    shared = models.BooleanField(default=False)
+    shared_by = models.ForeignKey(Profile, related_name="shared_by", on_delete=models.SET_NULL, null=True, blank=True)
+    shared_post_id = models.IntegerField(null=True, blank=True)
+    shared_at = models.DateTimeField(auto_now_add=True, blank=True, null=True)
 
 
 # To check if a user has already likes a post
@@ -52,11 +60,12 @@ class Comments(models.Model):
 # TODO create replies to comment
 
 
-# Signal to create an instance Profile when a User is create
+# Signal to create an instance Profile when a User is created
 def create_profile(sender, instance, created, **kwargs):
-    user = User.objects.get(username=instance)
-    profile = Profile(user=user)
-    profile.save()
+    if created:
+        user = User.objects.get(username=instance)
+        profile = Profile(user=user)
+        profile.save()
 
 
 post_save.connect(create_profile, sender=User)

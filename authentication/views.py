@@ -71,7 +71,7 @@ def login_page(request):
 
 def logout_page(request):
     logout(request)
-    return redirect('authentication:register')
+    return redirect('authentication:login')
 
 
 def change_password(request):

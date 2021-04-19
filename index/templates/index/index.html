@@ -20,13 +20,24 @@
   <h2>Blog Name</h2>
 </div>
 
+<div>
+  <a class="btn btn-primary" href="{% url 'index:new_post' %}">Write a new post <i class="fas fa-feather-alt"></i></a>
+</div>
+
 <div class="row px-5">
   <div class="leftcolumn">
     {% for post in posts %}
-          <a href="{% url 'index:post_details' post.id %}" style="text-decoration:none; color:black !important;" class="post">
+          <a href="{% if post.shared %}{% url 'index:post_details' post.shared_post_id %}{% else %}{% url 'index:post_details' post.id %}{% endif %}" style="text-decoration:none; color:black !important;" class="post">
             <div class="card">
+              {% if post.shared %}
+                <p class="badge bg-secondary" style="width:75px;">Shared</p>
+              {% endif %}
                 <h2 class="pb-0 mb-0">{{ post.title }}</h2>
-                <small class="text-muted mb-1">by {{post.author}}-{{ post.created_at }}</small>
+                <small class="text-muted mb-1">by {{post.author}}-{{ post.created_at }}
+                  {% if post.shared %}
+                    (Shared by: {{ post.shared_by }})
+                  {% endif %}
+                </small>
                 <div><img height="200px" src="{{ post.thumbnail }}" alt="thumbnail unavailable"></div>
                 <p>{{ post.content| markdown | safe | truncatewords:20}}</p>
             </div>

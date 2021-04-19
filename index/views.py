@@ -38,9 +38,10 @@ def new_post(request):
         # Get submitted title, content and tags
         title = request.POST.get('title')
         content = request.POST.get('content')
+        thumbnail = request.POST.get('image')
         post_tags = request.POST.getlist('tags')  # Get all submitted tags as a list
 
-        post = Post(title=title, content=content, author=profile)
+        post = Post(title=title, content=content, author=profile, thumbnail=thumbnail)
         post.save()
         # Getting the tag by its id and adding it to the 'post'
         for tag in post_tags:
@@ -105,3 +106,25 @@ def user_profile(request):
     ctx = {'users_posts': users_posts}
     return render(request, 'index/user_profile.html', ctx)
 
+
+def share_post(request, post_id):
+    try:
+        post = Post.objects.get(id=post_id)
+    except Post.DoesNotExist:
+        messages.error(request, "this post does not exist")
+        return redirect('index:index')
+
+    profile = Profile.objects.get(user=request.user)
+    title = post.title
+    content = post.content
+    thumbnail = post.thumbnail
+    post_tags = post.tags
+
+    post = Post(title=title, content=content, author=post.author, thumbnail=thumbnail, shared=True, shared_by=profile,
+                shared_post_id=post.id)
+    post.save()
+    # # Getting the tag by its id and adding it to the 'post'
+    for tag in post_tags.all():
+        post.tags.add(tag)
+
+    return redirect('index:index')

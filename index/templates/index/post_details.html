@@ -35,7 +35,7 @@
       </div>
       <div class="modal-body">
           Share post link: <a href="{% url 'index:post_details' post.id %}" id="post_url_a"></a> <a title="copy to clipboard" onclick="copyFunction()" class="btn"><i class="far fa-copy"></i></a> <br>
-          Share to your profile: <a href="">Share <i class="px-1 fas fa-share"></i></a>
+          Share to your profile: <a href="{% url 'index:share_post' post.id %}">Share <i class="px-1 fas fa-share"></i></a>
           <input type="text" readonly style="position:absolute; left:-9999px;" id="post_url">
           <script>
               document.getElementById("post_url").value = window.location.href;

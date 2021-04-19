@@ -5,5 +5,5 @@ from django.contrib.auth.models import User
 class Profile(models.Model):
     def __str__(self):
         return self.user.username
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
     # followers = models.ManyToManyField(User)

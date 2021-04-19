@@ -9,4 +9,5 @@ urlpatterns = [
     path('new_post/', views.new_post, name="new_post"),
     path('like/<int:post_id>', views.post_like, name="post_like"),
     path('user_profile/', views.user_profile, name="user_profile"),
+    path('share_post/<int:post_id>', views.share_post, name="share_post"),
 ]
