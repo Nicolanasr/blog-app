@@ -4,8 +4,36 @@
 
 {% block body %}
 
-<form action="" method="GET">
-    {% csrf_token %}
-</form>
+<div class="container mt-3 mb-5">
+    <form action="" method="POST">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="Title">Title:</label>
+            <input type="text" class="form-control" maxlength="200" id="Title" name="title" placeholder="title" required>
+        </div>
+        <div class="form-group mt-4">
+            <label for="content" class="pb-2">Write your post here: <small class="form-text text-muted">(you can use markdown to design your text however you like)</small></label>
+            <textarea class="form-control" rows="20" id="content" name="content" required></textarea>
+        </div>
+        <div class="form-group mt-3">
+            <label for="image">Thumbnail</label>
+            <input type="url" class="form-control" maxlength="200" id="image" name="image" placeholder="Paste a link to your thumbnail here" required>
+        </div>
+        <div class="form-group my-5">
+            <label for="tags">Select one or multiple tag(s) for your post</label> <br>
+            <small class="form-text mb-2">To select multiple tags hold the control key and select the tags</small>
+            <select multiple class="form-control" id="tags" name="tags" required>
+                {% for tag in tags %}
+                    <option value="{{tag.id}}">{{tag}}</option>
+                {% endfor %}
+            </select>
+        </div>
 
+        <button type="submit" class="btn btn-primary">Submit</button>
+
+    </form>
+</div>
+<pre class="mt-5"> </pre>
+<pre class="mt-5"> </pre>
+<pre class="mt-5"> </pre>
 {% endblock %}
