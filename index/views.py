@@ -26,8 +26,9 @@ def post_details(request, post_id):
         user_like = ""
         has_liked = False
 
-    print(user_like)
-    ctx = {'post': post, 'user_like': user_like, 'has_liked': has_liked}
+    comments = Comments.objects.filter(post=post)
+
+    ctx = {'post': post, 'user_like': user_like, 'has_liked': has_liked, 'comment': comments}
     return render(request, 'index/post_details.html', ctx)
 
 
@@ -139,3 +140,29 @@ def share_post(request, post_id):
         post.tags.add(tag)
 
     return redirect('index:index')
+
+
+def post_comment(request, post_id):
+    if request.method == 'POST':
+        try:
+            post = Post.objects.get(id=post_id)
+        except Post.DoesNotExist:
+            messages.error(request, 'post does not exist')
+            return redirect('index:index')
+
+        try:
+            user = User.objects.get(username=request.user)
+            profile = Profile.objects.get(user=user)
+        except:
+            messages.error(request, 'Oops, something went wrong!')
+            return redirect('index:index')
+        
+        content = request.POST.get('content')
+
+        comment = Comments(author=profile, content=content, post=post)
+        comment.save()
+        return redirect('index:post_details', post_id)
+
+    else:
+        messages.error(request, 'Oops, something went wrong!')
+        return redirect('index:index')

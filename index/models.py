@@ -51,6 +51,8 @@ class LikesUsers(models.Model):
 
 # Comments to a post model
 class Comments(models.Model):
+    class Meta:
+        ordering = ['-created_at']
     post = models.ForeignKey(Post, on_delete=models.CASCADE)
     author = models.ForeignKey(Profile, on_delete=models.SET_NULL,  null=True, blank=True)
     content = models.TextField(null=False, blank=False)

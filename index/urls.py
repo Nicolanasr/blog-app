@@ -10,4 +10,6 @@ urlpatterns = [
     path('like/<int:post_id>', views.post_like, name="post_like"),
     path('user_profile/<str:profile>', views.user_profile, name="user_profile"),
     path('share_post/<int:post_id>', views.share_post, name="share_post"),
+    path('post_comment/<int:post_id>', views.post_comment, name="post_comment"),
+
 ]

@@ -2,15 +2,17 @@
 {% load markdown_extras %}
 {% load static %}
 {% block title %} {{ post.title }} {% endblock %}
-{% block add_link %}<link rel="stylesheet" href="{% static 'css/feed_page.css' %}">{% endblock %}
+{% block add_link %}
+<link rel="stylesheet" href="{% static 'css/feed_page.css' %}">{% endblock %}
 
 {% block body %}
 
 <div class="container-sm mt-2">
     {% if post.shared %}
-        <p class="badge bg-secondary" style="width:75px;">Shared</p>
-        <small class="text-muted">This post is a shared post by {{ post.shared_by }}.</small>
-        <small class="text-muted"><a href="{% url 'index:post_details' post.shared_post_id %}">Click here</a> to check the original post</small>
+    <p class="badge bg-secondary" style="width:75px;">Shared</p>
+    <small class="text-muted">This post is a shared post by {{ post.shared_by }}.</small>
+    <small class="text-muted"><a href="{% url 'index:post_details' post.shared_post_id %}">Click here</a> to check the
+        original post</small>
     {% endif %}
     <div class="d-flex justify-content-between align-items-end">
         <h2 class="pb-0 mb-0">{{ post.title }}</h2>
@@ -23,8 +25,12 @@
     <form action="" method="POST" id="form">
         {% csrf_token %}
         <small class="text-muted">Liked that post? Give it a thumbs up and share it</small> <br> <br>
-        <button type="button" id="like_btn" name="like_val" class="btn text-primary {% if has_liked and user_like.value == 1 %} bg-primary text-white {% endif %}" value="like"><i class="far fa-arrow-alt-circle-up"></i></button>
-        <button type="button" id="dislike_btn" name="like_val" class="btn text-danger mx-3 {% if has_liked and user_like.value == -1 %} bg-danger text-white {% endif %}" value="dislike"><i class="far fa-arrow-alt-circle-down"></i></button>
+        <button type="button" id="like_btn" name="like_val"
+            class="btn text-primary {% if has_liked and user_like.value == 1 %} bg-primary text-white {% endif %}"
+            value="like"><i class="far fa-arrow-alt-circle-up"></i></button>
+        <button type="button" id="dislike_btn" name="like_val"
+            class="btn text-danger mx-3 {% if has_liked and user_like.value == -1 %} bg-danger text-white {% endif %}"
+            value="dislike"><i class="far fa-arrow-alt-circle-down"></i></button>
         <a href="#share" data-bs-toggle="modal" data-bs-target="#shareModal">Share</a>
         <br> <br>
         <pre>People who likes it: <span id="likes_count">{{ post.likes }}</span></pre>
@@ -32,66 +38,100 @@
 </div>
 
 <div class="modal fade" id="shareModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-  <div class="modal-dialog">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h5 class="modal-title" id="exampleModalLabel">Share post</h5>
-        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-      </div>
-      <div class="modal-body">
-          Share post link: <a href="{% url 'index:post_details' post.id %}" id="post_url_a"></a> <a title="copy to clipboard" onclick="copyFunction()" class="btn"><i class="far fa-copy"></i></a> <br>
-          Share to your profile: <a href="{% url 'index:share_post' post.id %}">Share <i class="px-1 fas fa-share"></i></a>
-          <input type="text" readonly style="position:absolute; left:-9999px;" id="post_url">
-          <script>
-              document.getElementById("post_url").value = window.location.href;
-              document.getElementById("post_url_a").innerHTML = window.location.href;
-              function copyFunction(){
-                  var copyText = document.getElementById("post_url");
-                  copyText.focus();
-                  copyText.select();
-                  copyText.setSelectionRange(0, 99999);
-                  document.execCommand("copy");
-                 }
-            </script>
-      </div>
-<!--      <div class="modal-footer">-->
-<!--        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>-->
-<!--        <button type="button" class="btn btn-primary">Save changes</button>-->
-<!--      </div>-->
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Share post</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Share post link: <a href="{% url 'index:post_details' post.id %}" id="post_url_a"></a> <a
+                    title="copy to clipboard" onclick="copyFunction()" class="btn"><i class="far fa-copy"></i></a> <br>
+                Share to your profile: <a href="{% url 'index:share_post' post.id %}">Share <i
+                        class="px-1 fas fa-share"></i></a>
+                <input type="text" readonly style="position:absolute; left:-9999px;" id="post_url">
+                <script>
+                    document.getElementById("post_url").value = window.location.href;
+                    document.getElementById("post_url_a").innerHTML = window.location.href;
+
+                    function copyFunction() {
+                        var copyText = document.getElementById("post_url");
+                        copyText.focus();
+                        copyText.select();
+                        copyText.setSelectionRange(0, 99999);
+                        document.execCommand("copy");
+                    }
+                </script>
+            </div>
+        </div>
     </div>
-  </div>
 </div>
-<br><br> <hr><hr>
+<br><br>
+<hr>
+<hr>
 
 <div class="container-sm">
     <span id="comments"></span>
     <h3 style="border-bottom: 1px solid #403a3a !important; width:140px;">Comments</h3>
+    <form action="{% url 'index:post_comment' post.id %}" method="POST">
+        {% csrf_token %}
+        <textarea class="form-control" placeholder="Leave a comment here" id="comment" name="content"
+            style="height: 100px"></textarea>
+        <button type="submit" class="btn btn-primary mt-1" style="float: right;">Comment</button>
+    </form>
+    <br><br>
+    <hr>
+    {% for comment in comment %}
+    <div class="card p-md-3 mb-2 p-sm-1 p-0 pt-3" style="max-width: 100%;">
+        <div class="">
+            <div class="d-flex flex-column ms-2">
+                <div class="mb-1 text-primary d-flex justify-content-between">
+                    <h6 class="">{{ comment.author }}</h6>
+                </div>
+                <p class="comment-text">{{ comment.content }}</p>
+                <div class="d-flex flex-row justify-content-end"> <span
+                        class="text-muted fw-normal fs-10">{{ comment.created_at }}</span>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+    <div class="d-flex justify-content-between">
+        <div class="d-flex flex-row gap-3 align-items-center">
+            <!-- <div class="d-flex align-items-center"> <i class="fa fa-heart-o"></i> <span class="ms-1 fs-10">Like</span> </div>
+                <div class="d-flex align-items-center"> <i class="fa fa-comment-o"></i> <span class="ms-1 fs-10">Comments</span> </div> -->
+        </div>
+
+    </div>
+</div>
+
 </div>
 
 <br><br><br><br><br><br><br><br>
 
 <script>
     f = document.getElementById("form")
-    f.addEventListener('submit', fun=>{
-          fun.preventDefault();
-        })
+    f.addEventListener('submit', fun => {
+        fun.preventDefault();
+    })
 
-    $("#like_btn").click(function() {
-        if($("#dislike_btn").hasClass("bg-danger text-white")){
+    $("#like_btn").click(function () {
+        if ($("#dislike_btn").hasClass("bg-danger text-white")) {
             $("#dislike_btn").removeClass(" bg-danger text-white ")
         } else {
             $(this).addClass(" bg-primary text-white ")
         }
     })
-    $("#dislike_btn").click(function() {
-        if($("#like_btn").hasClass("bg-primary text-white")){
+    $("#dislike_btn").click(function () {
+        if ($("#like_btn").hasClass("bg-primary text-white")) {
             $("#like_btn").removeClass(" bg-primary text-white ")
         } else {
             $(this).addClass(" bg-danger text-white ")
         }
     })
 
-    $("[name='like_val']").click(function() {
+    $("[name='like_val']").click(function () {
         const url = "{% url 'index:post_like' post.id%}"
         const fd = new FormData()
 
@@ -102,26 +142,26 @@
         fd.append('csrfmiddlewaretoken', csrf[0].value)
 
         $.ajax({
-              type: 'POST',
-              url: url,
-              data: fd,
-              cache: false,
-              processData: false,
-              contentType: false,
-              success: function (success){
+            type: 'POST',
+            url: url,
+            data: fd,
+            cache: false,
+            processData: false,
+            contentType: false,
+            success: function (success) {
                 console.log(success)
-                if(success[''] == 'like') {
+                if (success[''] == 'like') {
                     var count = parseInt($("#likes_count").text()) + 1
                     $("#likes_count").text(count)
-                } else if(success[''] == 'dislike') {
+                } else if (success[''] == 'dislike') {
                     var count = parseInt($("#likes_count").text()) - 1
                     $("#likes_count").text(count)
                 }
-              },
-              error: function(error) {
-                  console.log(error)
-              }
-          })
+            },
+            error: function (error) {
+                console.log(error)
+            }
+        })
     });
 </script>
 
