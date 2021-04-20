@@ -48,7 +48,7 @@
     <div class="card">
       <h2>About Me</h2>
       <div class="fakeimg" style="height:100px;">Image</div>
-      <a href="{% url 'index:user_profile' %}">My profile</a>
+      <a href="{% url 'index:user_profile' request.user%}">My profile</a>
       <p>Some text about me in culpa qui officia deserunt mollit anim..</p>
     </div>
     <div class="card">

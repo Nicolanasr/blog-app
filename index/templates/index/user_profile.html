@@ -9,20 +9,51 @@
   .post:hover h2 {
     text-decoration: underline !important;
   }
+
+
 </style>
 
 
-<div class="container">
-    {% for post in users_posts %}
-      <a href="{% url 'index:post_details' post.id %}" style="text-decoration:none; color:black !important;" class="post">
-        <div class="card py-2 px-4 my-3">
-            <h2 class="pb-0 mb-0">{{ post.title }}</h2>
-            <small class="text-muted mb-1">by {{post.author}}-{{ post.created_at }}</small>
-            <div><img height="200px" src="{{ post.thumbnail }}" alt="thumbnail unavailable"></div>
-            <p>{{ post.content| markdown | safe | truncatewords:20}}</p>
+<div class="container mt-2">
+    <nav>
+        <div class="nav nav-tabs" id="nav-tab" role="tablist">
+            <button class="nav-link active" id="nav-home-tab" data-bs-toggle="tab" data-bs-target="#nav-home"
+                    type="button" role="tab" aria-controls="nav-home" aria-selected="true">Posted
+            </button>
+            <button class="nav-link" id="nav-profile-tab" data-bs-toggle="tab" data-bs-target="#nav-profile"
+                    type="button" role="tab" aria-controls="nav-profile" aria-selected="false">Shared
+            </button>
         </div>
-      </a>
-    {% endfor %}
+    </nav>
+    <div class="tab-content" id="nav-tabContent">
+        <div class="tab-pane fade show active" id="nav-home" role="tabpanel" aria-labelledby="nav-home-tab">
+            {% for post in users_posts %}
+            <a href="{% url 'index:post_details' post.id %}" style="text-decoration:none; color:black !important;"
+               class="post">
+                <div class="card py-2 px-4 my-3">
+                    <h2 class="pb-0 mb-0">{{ post.title }}</h2>
+                    <small class="text-muted mb-1">by {{post.author}}-{{ post.created_at }}</small>
+                    <div><img height="200px" src="{{ post.thumbnail }}" alt="thumbnail unavailable"></div>
+                    <p>{{ post.content| markdown | safe | truncatewords:20}}</p>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+        <div class="tab-pane fade" id="nav-profile" role="tabpanel" aria-labelledby="nav-profile-tab">
+            {% for post in shared_posts %}
+            <a href="{% url 'index:post_details' post.shared_post_id %}" style="text-decoration:none; color:black !important;"
+               class="post">
+                <div class="card py-2 px-4 my-3">
+                    <h2 class="pb-0 mb-0">{{ post.title }}</h2>
+                    <small class="text-muted mb-1">by {{post.author}}-{{ post.created_at }}</small>
+                    <div><img height="200px" src="{{ post.thumbnail }}" alt="thumbnail unavailable"></div>
+                    <p>{{ post.content| markdown | safe | truncatewords:20}}</p>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+
 
 </div>
 

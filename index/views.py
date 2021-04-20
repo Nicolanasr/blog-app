@@ -99,11 +99,22 @@ def post_like(request, post_id):
 
 
 # User profile (to see all posted posts)
-def user_profile(request):
-    profile = Profile.objects.get(user=request.user)
-    users_posts = profile.post_set.all()
+def user_profile(request, profile):
+    try:
+        user = User.objects.get(username=profile)
+        profile = Profile.objects.get(user=user)
+    except User.DoesNotExist:
+        messages.error(request, "This user does not exits")
+        return redirect("index:index")
 
-    ctx = {'users_posts': users_posts}
+    users_posts = profile.post_set.filter(shared=False)
+    try:
+        shared_posts = Post.objects.filter(shared=True, shared_by=profile)
+    except:
+        shared_posts = ""
+    print(shared_posts)
+
+    ctx = {'users_posts': users_posts, 'shared_posts': shared_posts}
     return render(request, 'index/user_profile.html', ctx)
 
 

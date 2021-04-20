@@ -7,6 +7,11 @@
 {% block body %}
 
 <div class="container-sm mt-2">
+    {% if post.shared %}
+        <p class="badge bg-secondary" style="width:75px;">Shared</p>
+        <small class="text-muted">This post is a shared post by {{ post.shared_by }}.</small>
+        <small class="text-muted"><a href="{% url 'index:post_details' post.shared_post_id %}">Click here</a> to check the original post</small>
+    {% endif %}
     <div class="d-flex justify-content-between align-items-end">
         <h2 class="pb-0 mb-0">{{ post.title }}</h2>
         <p class="">Likes: {{ post.likes }}</p>
