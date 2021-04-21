@@ -1,6 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import User
-from django.db.models.signals import post_save
+
 from authentication.models import Profile
 
 
@@ -61,13 +61,3 @@ class Comments(models.Model):
 
 # TODO create replies to comment
 
-
-# Signal to create an instance Profile when a User is created
-def create_profile(sender, instance, created, **kwargs):
-    if created:
-        user = User.objects.get(username=instance)
-        profile = Profile(user=user)
-        profile.save()
-
-
-post_save.connect(create_profile, sender=User)

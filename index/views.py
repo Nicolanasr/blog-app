@@ -1,13 +1,28 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse, Http404
 from .models import Tags, Post, Comments, LikesUsers, User
-from authentication.models import Profile
+from authentication.models import Profile, FollowModel
 from django.contrib import messages
 
 
 def index(request):
     posts = Post.objects.all()
-    ctx = {'posts': posts}
+    profile = Profile.objects.get(user=request.user)
+    follow_model = FollowModel.objects.get(follower=profile)
+
+    following = []
+    for fl in follow_model.following.all():
+        following.append(fl)
+    
+    posts_of_following = []
+    # append all the posts from profiles that the user follow 
+    for post in posts:
+        if post.author in following and post.shared == False: # To not add the shared posts from profiles that the user does not follow but he follow the original author
+            posts_of_following.append(post)
+        elif post.shared == True and post.shared_by in following:  # To also add shared posts by profiles he follows
+            posts_of_following.append(post)
+
+    ctx = {'posts': posts_of_following}
     return render(request, 'index/index.html', ctx)
 
 
@@ -28,7 +43,24 @@ def post_details(request, post_id):
 
     comments = Comments.objects.filter(post=post)
 
-    ctx = {'post': post, 'user_like': user_like, 'has_liked': has_liked, 'comment': comments}
+    # Get all the profiles the user is following
+    follower = FollowModel.objects.get(follower=profile)
+    following = follower.following.all()
+    follower = follower.follower
+
+    # Check if the user is following the author of the original post
+    if post.author in following and post.author != follower: # Making sure the user can't unfollow himself
+        is_following = True
+        is_same = False
+    elif post.author == follower:
+        is_following = False
+        is_same = True
+    else:
+        is_following = False
+        is_same = False
+
+
+    ctx = {'post': post, 'user_like': user_like, 'has_liked': has_liked, 'comment': comments, 'is_following': is_following, 'is_same': is_same}
     return render(request, 'index/post_details.html', ctx)
 
 
@@ -113,9 +145,26 @@ def user_profile(request, profile):
         shared_posts = Post.objects.filter(shared=True, shared_by=profile)
     except:
         shared_posts = ""
-    print(shared_posts)
 
-    ctx = {'users_posts': users_posts, 'shared_posts': shared_posts}
+    # Get all the profiles the user is following
+    following_user = User.objects.get(username=request.user)
+    following_user_profile = Profile.objects.get(user=following_user)
+    follower = FollowModel.objects.get(follower=following_user_profile)
+    following = follower.following.all()
+    follower = follower.follower
+
+    # Check if the user is following the author of the original post
+    if profile in following and profile != follower: # Making sure the user can't unfollow himself
+        is_following = True
+        is_same = False
+    elif profile == follower:
+        is_following = False
+        is_same = True
+    else:
+        is_following = False
+        is_same = False
+
+    ctx = {'users_posts': users_posts, 'shared_posts': shared_posts, 'profile': profile, 'is_following': is_following, 'is_same': is_same}
     return render(request, 'index/user_profile.html', ctx)
 
 

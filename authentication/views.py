@@ -4,6 +4,7 @@ from django.contrib.auth.forms import UserCreationForm, PasswordChangeForm
 from django.contrib import messages
 from .forms import CreateUserForm, ChangeUserForm
 from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
+from .models import FollowModel, User, Profile
 
 
 def account(request):
@@ -90,3 +91,35 @@ def change_password(request):
             messages.error(request, errors[0])
 
     return render(request, 'authentication/change_password.html', ctx)
+
+
+def follow(request, user_to_follow):
+    #TODO transform to ajax
+    try:
+        user = User.objects.get(username=user_to_follow)
+        profile_to_follow = Profile.objects.get(user=user)
+    except User.DoesNotExist:
+        messages.error(request, "Error! User with username " + str(user_to_follow) + " does not exist")
+        return redirect('index:index')
+
+    profile = Profile.objects.get(user=request.user)
+    follower, created = FollowModel.objects.get_or_create(follower=profile)
+
+    follower.following.add(profile_to_follow)
+    return redirect(request.META.get('HTTP_REFERER'))
+
+
+def unfollow(request, user_to_unfollow):
+    #TODO transform to ajax
+    try:
+        user = User.objects.get(username=user_to_unfollow)
+        profile_to_follow = Profile.objects.get(user=user)
+    except User.DoesNotExist:
+        messages.error(request, "Error! User with username " + str(user_to_unfollow) + " does not exist")
+        return redirect('index:index')
+
+    profile = Profile.objects.get(user=request.user)
+    follower, created = FollowModel.objects.get_or_create(follower=profile)
+
+    follower.following.remove(profile_to_follow)
+    return redirect(request.META.get('HTTP_REFERER'))
