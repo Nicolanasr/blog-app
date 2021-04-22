@@ -13,13 +13,29 @@
 
 </style>
 
-{% if not is_same %}
-    {% if not is_following %}
-            <span><a class="btn-sm btn-primary mx-1" style="text-decoration: none;" href="{% url 'authentication:follow' profile.user.username %}">Follow </a>
-    {% else %}
-        <a class="btn-sm btn-primary mx-1" style="text-decoration: none;" href="{% url 'authentication:unfollow' profile.user.username %}">Unfollow </a>
-    {% endif %}
-{% endif %}
+<div class="container d-flex flex-row mt-2">
+    <div class="col-md-2 col-4 ">
+        <img style="max-width: 100px;" src="https://external-content.duckduckgo.com/iu/?u=https%3A%2F%2Fcdn.onlinewebfonts.com%2Fsvg%2Fimg_568656.png&f=1&nofb=1" alt="profile pic">
+        <div class="mt-1">
+            {% if not is_same %}
+                {% if not is_following %}
+                        <a class="btn-sm btn-primary mx-1" style="text-decoration: none;" href="{% url 'authentication:follow' profile.user.username %}">Follow </a>
+                {% else %}
+                    <a class="btn-sm btn-primary mx-1" style="text-decoration: none;" href="{% url 'authentication:unfollow' profile.user.username %}">Unfollow </a>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+    <div class="col">
+        first name: {{ profile.user.first_name }} <br>
+        last name: {{ profile.user.last_name }} <br>
+        username: {{ profile.user.username }} <br>
+        email: {{ profile.user.email }} <br>
+        following: {{following.count|add:-1}}
+        followers: {{followers.count|add:-1}}
+    </div>
+</div>
+
 
 <div class="container mt-2">
     <nav>

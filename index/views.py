@@ -6,24 +6,26 @@ from django.contrib import messages
 
 
 def index(request):
-    posts = Post.objects.all()
-    profile = Profile.objects.get(user=request.user)
-    follow_model = FollowModel.objects.get(follower=profile)
+    if request.user.is_authenticated:
+        posts = Post.objects.all()
+        profile = Profile.objects.get(user=request.user)
+        follow_model = FollowModel.objects.get(follower=profile)
+        following = []
+        for fl in follow_model.following.all():
+            following.append(fl)
+        
+        posts_of_following = []
+        # append all the posts from profiles that the user follow 
+        for post in posts:
+            if post.author in following and post.shared == False: # To not add the shared posts from profiles that the user does not follow but he follow the original author
+                posts_of_following.append(post)
+            elif post.shared == True and post.shared_by in following:  # To also add shared posts by profiles he follows
+                posts_of_following.append(post)
 
-    following = []
-    for fl in follow_model.following.all():
-        following.append(fl)
-    
-    posts_of_following = []
-    # append all the posts from profiles that the user follow 
-    for post in posts:
-        if post.author in following and post.shared == False: # To not add the shared posts from profiles that the user does not follow but he follow the original author
-            posts_of_following.append(post)
-        elif post.shared == True and post.shared_by in following:  # To also add shared posts by profiles he follows
-            posts_of_following.append(post)
-
-    ctx = {'posts': posts_of_following}
-    return render(request, 'index/index.html', ctx)
+        ctx = {'posts': posts_of_following}
+        return render(request, 'index/index.html', ctx)
+    else:
+        return redirect('authentication:login')
 
 
 def post_details(request, post_id):
@@ -149,9 +151,9 @@ def user_profile(request, profile):
     # Get all the profiles the user is following
     following_user = User.objects.get(username=request.user)
     following_user_profile = Profile.objects.get(user=following_user)
-    follower = FollowModel.objects.get(follower=following_user_profile)
-    following = follower.following.all()
-    follower = follower.follower
+    follow_model = FollowModel.objects.get(follower=following_user_profile)
+    following = follow_model.following.all()
+    follower = follow_model.follower
 
     # Check if the user is following the author of the original post
     if profile in following and profile != follower: # Making sure the user can't unfollow himself
@@ -164,7 +166,11 @@ def user_profile(request, profile):
         is_following = False
         is_same = False
 
-    ctx = {'users_posts': users_posts, 'shared_posts': shared_posts, 'profile': profile, 'is_following': is_following, 'is_same': is_same}
+    visited_user = FollowModel.objects.get(follower=profile)
+    following = visited_user.following.all()
+    followers = visited_user.followers.all()
+
+    ctx = {'users_posts': users_posts, 'shared_posts': shared_posts, 'profile': profile, 'is_following': is_following, 'is_same': is_same, 'following': following, 'followers': followers}
     return render(request, 'index/user_profile.html', ctx)
 
 

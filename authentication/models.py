@@ -15,6 +15,7 @@ class FollowModel(models.Model):
     
     follower = models.ForeignKey(Profile, on_delete=models.CASCADE)
     following = models.ManyToManyField(Profile, related_name="following_list", blank=True)
+    followers = models.ManyToManyField(Profile, related_name="followers_list", blank=True)
 
 
 
@@ -27,6 +28,7 @@ def create_profile(sender, instance, created, **kwargs):
         follow_model = FollowModel(follower=profile)
         follow_model.save()
         follow_model.following.add(profile)
+        follow_model.followers.add(profile)
 
 
 post_save.connect(create_profile, sender=User)

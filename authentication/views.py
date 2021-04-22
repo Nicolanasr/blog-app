@@ -105,8 +105,21 @@ def follow(request, user_to_follow):
     profile = Profile.objects.get(user=request.user)
     follower, created = FollowModel.objects.get_or_create(follower=profile)
 
+    # making sure the user can't follow himself
+    
+    if profile == profile_to_follow:
+        messages.error(request, 'You cannot follow yourself')
+        return redirect('index:index')
+
     follower.following.add(profile_to_follow)
-    return redirect(request.META.get('HTTP_REFERER'))
+
+    profile_to_follow_follow_model, created = FollowModel.objects.get_or_create(follower=profile_to_follow)
+    profile_to_follow_follow_model.followers.add(profile)
+    try:
+        return redirect(request.META.get('HTTP_REFERER'))
+    except:
+        return redirect('index:index')
+
 
 
 def unfollow(request, user_to_unfollow):
@@ -121,5 +134,16 @@ def unfollow(request, user_to_unfollow):
     profile = Profile.objects.get(user=request.user)
     follower, created = FollowModel.objects.get_or_create(follower=profile)
 
+    # making sure the user can't unfollow himself
+    if profile == profile_to_follow:
+        messages.error(request, 'You cannot unfollow yourself')
+        return redirect('index:index')
+        
     follower.following.remove(profile_to_follow)
-    return redirect(request.META.get('HTTP_REFERER'))
+
+    profile_to_follow_follow_model, created = FollowModel.objects.get_or_create(follower=profile_to_follow)
+    profile_to_follow_follow_model.followers.remove(profile)
+    try:
+        return redirect(request.META.get('HTTP_REFERER'))
+    except:
+        return redirect('index:index')

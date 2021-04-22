@@ -33,11 +33,11 @@
                 <p class="badge bg-secondary" style="width:75px;">Shared</p>
               {% endif %}
                 <h2 class="pb-0 mb-0">{{ post.title }}</h2>
-                <small class="text-muted mb-1">by {{post.author}}-{{ post.created_at }}
+                <div class="text-muted mb-1" style="font-size: 15px"><span class="text-muted">by</span> <a href="{% url 'index:user_profile' post.author %}">{{post.author}}</a>-{{ post.created_at }}
                   {% if post.shared %}
-                    (Shared by: {{ post.shared_by }})
+                    (Shared by: <a href="{% url 'index:user_profile' post.shared_by %}">{{ post.shared_by }}</a>)
                   {% endif %}
-                </small>
+                </div>
                 <div><img height="200px" src="{{ post.thumbnail }}" alt="thumbnail unavailable"></div>
                 <p>{{ post.content| markdown | safe | truncatewords:20}}</p>
             </div>
