@@ -3,6 +3,30 @@ from django.http import HttpResponse, JsonResponse, Http404
 from .models import Tags, Post, Comments, LikesUsers, User, ViewedPost
 from authentication.models import Profile, FollowModel
 from django.contrib import messages
+import random
+
+
+
+# ~ To add test data to  database
+# for i in range(0, 100):
+#         profiles = Profile.objects.all()
+#         random_profile = random.choice(profiles)
+
+#         title = "title demo" + str(i)
+#         views = random.randint(0, 500)
+#         views_for_algo = random.randint(1,views+1)
+#         likes = random.randint(0, views_for_algo)
+
+#         post = Post(title=title,
+#             author=random_profile,
+#             content="Just content",
+#             likes=likes,
+#             views=views,
+#             views_for_algo=views_for_algo,
+#             thumbnail="https://www.cameraegg.org/wp-content/uploads/2016/01/Nikon-D500-Sample-Images-2.jpg"
+#             )
+#         post.save()
+
 
 
 def index(request):
@@ -26,6 +50,46 @@ def index(request):
         return render(request, 'index/index.html', ctx)
     else:
         return redirect('authentication:login')
+
+
+# To display the most popular posts based on posts views / likes algorithm
+def discover(request):
+    # for i in range(0, 100):
+    #     profiles = Profile.objects.all()
+    #     random_profile = random.choice(profiles)
+
+    #     title = "title demo" + str(i)
+    #     views = random.randint(0, 500)
+    #     views_for_algo = random.randint(1,views+1)
+    #     likes = random.randint(0, views_for_algo)
+
+    #     post = Post(title=title,
+    #         author=random_profile,
+    #         content="Just content",
+    #         likes=likes,
+    #         views=views,
+    #         views_for_algo=views_for_algo,
+    #         thumbnail="https://www.cameraegg.org/wp-content/uploads/2016/01/Nikon-D500-Sample-Images-2.jpg"
+    #         )
+    #     post.save()
+    # TODO make sure the ranking system is woerking correctly (check post 72)
+    if request.user.is_authenticated:
+        print()
+        for post in Post.objects.all():
+            try:
+                rank = (post.likes * 100) / post.views_for_algo
+            except:
+                rank = 0.0
+            Post.objects.select_for_update().filter(id=post.id).update(rank=rank)
+        
+        posts = Post.objects.all().order_by('-rank', '-views_for_algo')[:20]
+        expected_views = Profile.objects.count() * 10 / 100
+        
+        ctx = {'posts': posts, 'expected_views': expected_views}
+        return render(request, 'index/discover.html', ctx)
+    else:
+        messages.error(request, 'please sign in to view this page')
+        return redirect('index:index')
 
 
 def post_details(request, post_id):

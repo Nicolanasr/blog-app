@@ -20,12 +20,12 @@
   <h2>Blog Name</h2>
 </div>
 
-<div>
-  <a class="btn btn-primary" href="{% url 'index:new_post' %}">Write a new post <i class="fas fa-feather-alt"></i></a>
-</div>
 
 <div class="row px-5">
   <div class="leftcolumn">
+  <div>
+    <a class="btn btn-primary mt-2" href="{% url 'index:new_post' %}">Write a new post <i class="fas fa-feather-alt"></i></a>
+  </div>
     {% for post in posts %}
           <a href="{% if post.shared %}{% url 'index:post_details' post.shared_post_id %}{% else %}{% url 'index:post_details' post.id %}{% endif %}" style="text-decoration:none; color:black !important;" class="post">
             <div class="card">

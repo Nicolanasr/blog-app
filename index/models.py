@@ -26,6 +26,7 @@ class Post(models.Model):
     likes = models.IntegerField(default=0)
     views = models.IntegerField(default=0)
     views_for_algo = models.IntegerField(default=0) # To hide from admin: , db_index=True, editable=False
+    rank = models.IntegerField(default=0)
     tags = models.ManyToManyField(Tags)
     thumbnail = models.URLField(null=True, blank=True)
     shared = models.BooleanField(default=False)
