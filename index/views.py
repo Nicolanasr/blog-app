@@ -1,6 +1,6 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse, Http404
-from .models import Tags, Post, Comments, LikesUsers, User
+from .models import Tags, Post, Comments, LikesUsers, User, ViewedPost
 from authentication.models import Profile, FollowModel
 from django.contrib import messages
 
@@ -49,6 +49,18 @@ def post_details(request, post_id):
     follower = FollowModel.objects.get(follower=profile)
     following = follower.following.all()
     follower = follower.follower
+
+
+    viewd_post, created = ViewedPost.objects.get_or_create(post=post, Profile=profile)
+    print(viewd_post, created)
+
+    post_views = post.views
+    post_views = post_views + 1
+    post_views_for_algo = post.views_for_algo
+    if created:
+        post_views_for_algo = post_views_for_algo + 1
+    
+    Post.objects.select_for_update().filter(id=post_id).update(views=post_views, views_for_algo=post_views_for_algo)
 
     # Check if the user is following the author of the original post
     if post.author in following and post.author != follower: # Making sure the user can't unfollow himself

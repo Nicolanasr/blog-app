@@ -24,6 +24,8 @@ class Post(models.Model):
     content = models.TextField(null=True, blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
     likes = models.IntegerField(default=0)
+    views = models.IntegerField(default=0)
+    views_for_algo = models.IntegerField(default=0) # To hide from admin: , db_index=True, editable=False
     tags = models.ManyToManyField(Tags)
     thumbnail = models.URLField(null=True, blank=True)
     shared = models.BooleanField(default=False)
@@ -48,6 +50,13 @@ class LikesUsers(models.Model):
     post = models.ForeignKey(Post, on_delete=models.CASCADE, null=False, blank=False)
     value = models.IntegerField(choices=choice, null=False, blank=False)
 
+
+class ViewedPost(models.Model):
+    def __str__(self):
+        return str(self.Profile) + "-" + str(self.post)
+    
+    post = models.ForeignKey(Post, on_delete=models.CASCADE)
+    Profile = models.ForeignKey(Profile, on_delete=models.CASCADE)
 
 # Comments to a post model
 class Comments(models.Model):
