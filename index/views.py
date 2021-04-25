@@ -27,10 +27,37 @@ import random
 #             )
 #         post.save()
 
+# for i in range(0, profiles.count()):
+#     profile_to_follow = random.choice(profiles)
 
+#     profile = random.choice(profiles)
+#     follower, created = FollowModel.objects.get_or_create(follower=profile)
+
+#     # making sure the user can't follow himself
+    
+#     if profile == profile_to_follow:
+#         continue
+
+#     follower.following.add(profile_to_follow)
+
+#     profile_to_follow_follow_model, created = FollowModel.objects.get_or_create(follower=profile_to_follow)
+#     profile_to_follow_follow_model.followers.add(profile)
 
 def index(request):
     if request.user.is_authenticated:
+        for post in Post.objects.all():
+            try:
+                if post.views_for_algo >= (post.views * 15) / 100:
+                    rank = (post.likes * 100) / post.views_for_algo
+                else:
+                    rank = 0.0
+            except:
+                rank = 0.0
+            Post.objects.select_for_update().filter(id=post.id).update(rank=rank)
+        
+        popular_posts = Post.objects.all().order_by('-rank')[:3]
+        expected_views = Profile.objects.count() * 10 / 100
+        
         posts = Post.objects.all()
         profile = Profile.objects.get(user=request.user)
         follow_model = FollowModel.objects.get(follower=profile)
@@ -46,7 +73,7 @@ def index(request):
             elif post.shared == True and post.shared_by in following:  # To also add shared posts by profiles he follows
                 posts_of_following.append(post)
 
-        ctx = {'posts': posts_of_following}
+        ctx = {'posts': posts_of_following, 'popular_posts': popular_posts, 'expected_views': expected_views}
         return render(request, 'index/index.html', ctx)
     else:
         return redirect('authentication:login')
@@ -54,26 +81,6 @@ def index(request):
 
 # To display the most popular posts based on posts views / likes algorithm
 def discover(request):
-    #!----------------------------------------
-    profiles = Profile.objects.all()
-    for i in range(0, profiles.count):
-        profile_to_follow = Profile.objects.get(user=random.choice(profiles))
-
-        profile = Profile.objects.get(user=random.choice(profiles))
-        follower, created = FollowModel.objects.get_or_create(follower=profile)
-
-        # making sure the user can't follow himself
-        
-        if profile == profile_to_follow:
-            continue
-
-        follower.following.add(profile_to_follow)
-
-        profile_to_follow_follow_model, created = FollowModel.objects.get_or_create(follower=profile_to_follow)
-        profile_to_follow_follow_model.followers.add(profile)
-
-    #!--------------------------------------
-    
     if request.user.is_authenticated:
         for post in Post.objects.all():
             try:

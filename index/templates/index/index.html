@@ -2,7 +2,8 @@
 {% load markdown_extras %}
 {% load static %}
 {% block title %} Index {% endblock %}
-{% block add_link %}<link rel="stylesheet" href="{% static 'css/feed_page.css' %}">{% endblock %}
+{% block add_link %}
+<link rel="stylesheet" href="{% static 'css/feed_page.css' %}">{% endblock %}
 
 
 {% block body %}
@@ -13,7 +14,7 @@
   }
 </style>
 {% for msg in messages %}
-  <p class="alert alert-danger w-100 text-center">{{ msg }}</p>
+<p class="alert alert-danger w-100 text-center">{{ msg }}</p>
 {% endfor %}
 
 <div class="header">
@@ -23,25 +24,28 @@
 
 <div class="row px-5">
   <div class="leftcolumn">
-  <div>
-    <a class="btn btn-primary mt-2" href="{% url 'index:new_post' %}">Write a new post <i class="fas fa-feather-alt"></i></a>
-  </div>
+    <div>
+      <a class="btn btn-primary mt-2" href="{% url 'index:new_post' %}">Write a new post <i
+          class="fas fa-feather-alt"></i></a>
+    </div>
     {% for post in posts %}
-          <a href="{% if post.shared %}{% url 'index:post_details' post.shared_post_id %}{% else %}{% url 'index:post_details' post.id %}{% endif %}" style="text-decoration:none; color:black !important;" class="post">
-            <div class="card">
-              {% if post.shared %}
-                <p class="badge bg-secondary" style="width:75px;">Shared</p>
-              {% endif %}
-                <h2 class="pb-0 mb-0">{{ post.title }}</h2>
-                <div class="text-muted mb-1" style="font-size: 15px"><span class="text-muted">by</span> <a href="{% url 'index:user_profile' post.author %}">{{post.author}}</a>-{{ post.created_at }}
-                  {% if post.shared %}
-                    (Shared by: <a href="{% url 'index:user_profile' post.shared_by %}">{{ post.shared_by }}</a>)
-                  {% endif %}
-                </div>
-                <div><img height="200px" src="{{ post.thumbnail }}" alt="thumbnail unavailable"></div>
-                <p>{{ post.content| markdown | safe | truncatewords:20}}</p>
-            </div>
-          </a>
+    <a href="{% if post.shared %}{% url 'index:post_details' post.shared_post_id %}{% else %}{% url 'index:post_details' post.id %}{% endif %}"
+      style="text-decoration:none; color:black !important;" class="post">
+      <div class="card">
+        {% if post.shared %}
+        <p class="badge bg-secondary" style="width:75px;">Shared</p>
+        {% endif %}
+        <h2 class="pb-0 mb-0">{{ post.title }}</h2>
+        <div class="text-muted mb-1" style="font-size: 15px"><span class="text-muted">by</span> <a
+            href="{% url 'index:user_profile' post.author %}">{{post.author}}</a>-{{ post.created_at }}
+          {% if post.shared %}
+          (Shared by: <a href="{% url 'index:user_profile' post.shared_by %}">{{ post.shared_by }}</a>)
+          {% endif %}
+        </div>
+        <div><img height="200px" src="{{ post.thumbnail }}" alt="thumbnail unavailable"></div>
+        <p>{{ post.content| markdown | safe | truncatewords:20}}</p>
+      </div>
+    </a>
     {% endfor %}
   </div>
   <div class="rightcolumn">
@@ -52,10 +56,28 @@
       <p>Some text about me in culpa qui officia deserunt mollit anim..</p>
     </div>
     <div class="card">
-      <h3>Popular Post</h3>
-      <div class="fakeimg">Image</div><br>
-      <div class="fakeimg">Image</div><br>
-      <div class="fakeimg">Image</div>
+    <h3><a href="{% url 'index:discover' %}">Popular posts</a></h3>
+      {% for post in popular_posts %}
+      {% if post.views_for_algo > 1 and post.views >= expected_views %}
+      <a href="{% if post.shared %}{% url 'index:post_details' post.shared_post_id %}{% else %}{% url 'index:post_details' post.id %}{% endif %}"
+        style="text-decoration:none; color:black !important;" class="post">
+        <div class="card">
+          {% if post.shared %}
+          <p class="badge bg-secondary" style="width:75px;">Shared</p>
+          {% endif %}
+          <h2 class="pb-0 mb-0">{{ post.title }}</h2>
+          <div class="text-muted mb-1" style="font-size: 15px"><span class="text-muted">by</span> <a
+              href="{% url 'index:user_profile' post.author %}">{{post.author}}</a>-{{ post.created_at }}
+            {% if post.shared %}
+            (Shared by: <a href="{% url 'index:user_profile' post.shared_by %}">{{ post.shared_by }}</a>)
+            {% endif %}
+          </div>
+          <div><img height="200px" src="{{ post.thumbnail }}" alt="thumbnail unavailable"></div>
+          <p>{{ post.content| markdown | safe | truncatewords:20}}</p>
+        </div>
+      </a>
+      {% endif %}
+      {% endfor %}
     </div>
     <div class="card">
       <h3>Follow Me</h3>

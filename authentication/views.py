@@ -66,6 +66,7 @@ def login_page(request):
             return redirect('index:index')
         else:
             messages.warning(request, 'Username or Password are incorrect')
+            return redirect('authentication:login')
 
     return render(request, 'authentication/login.html')
 
