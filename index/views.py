@@ -54,35 +54,38 @@ def index(request):
 
 # To display the most popular posts based on posts views / likes algorithm
 def discover(request):
-    # for i in range(0, 100):
-    #     profiles = Profile.objects.all()
-    #     random_profile = random.choice(profiles)
+    #!----------------------------------------
+    profiles = Profile.objects.all()
+    for i in range(0, profiles.count):
+        profile_to_follow = Profile.objects.get(user=random.choice(profiles))
 
-    #     title = "title demo" + str(i)
-    #     views = random.randint(0, 500)
-    #     views_for_algo = random.randint(1,views+1)
-    #     likes = random.randint(0, views_for_algo)
+        profile = Profile.objects.get(user=random.choice(profiles))
+        follower, created = FollowModel.objects.get_or_create(follower=profile)
 
-    #     post = Post(title=title,
-    #         author=random_profile,
-    #         content="Just content",
-    #         likes=likes,
-    #         views=views,
-    #         views_for_algo=views_for_algo,
-    #         thumbnail="https://www.cameraegg.org/wp-content/uploads/2016/01/Nikon-D500-Sample-Images-2.jpg"
-    #         )
-    #     post.save()
-    # TODO make sure the ranking system is woerking correctly (check post 72)
+        # making sure the user can't follow himself
+        
+        if profile == profile_to_follow:
+            continue
+
+        follower.following.add(profile_to_follow)
+
+        profile_to_follow_follow_model, created = FollowModel.objects.get_or_create(follower=profile_to_follow)
+        profile_to_follow_follow_model.followers.add(profile)
+
+    #!--------------------------------------
+    
     if request.user.is_authenticated:
-        print()
         for post in Post.objects.all():
             try:
-                rank = (post.likes * 100) / post.views_for_algo
+                if post.views_for_algo >= (post.views * 15) / 100:
+                    rank = (post.likes * 100) / post.views_for_algo
+                else:
+                    rank = 0.0
             except:
                 rank = 0.0
             Post.objects.select_for_update().filter(id=post.id).update(rank=rank)
         
-        posts = Post.objects.all().order_by('-rank', '-views_for_algo')[:20]
+        posts = Post.objects.all().order_by('-rank')[:20]
         expected_views = Profile.objects.count() * 10 / 100
         
         ctx = {'posts': posts, 'expected_views': expected_views}

@@ -121,7 +121,6 @@ def follow(request, user_to_follow):
         return redirect('index:index')
 
 
-
 def unfollow(request, user_to_unfollow):
     #TODO transform to ajax
     try:
