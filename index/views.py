@@ -2,9 +2,10 @@ from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse, Http404
 from .models import Tags, Post, Comments, LikesUsers, User, ViewedPost
 from authentication.models import Profile, FollowModel
+from django.shortcuts import get_list_or_404, get_object_or_404
 from django.contrib import messages
 import random
-
+import datetime
 
 
 # ~ To add test data to  database
@@ -82,6 +83,7 @@ def index(request):
 # To display the most popular posts based on posts views / likes algorithm
 def discover(request):
     if request.user.is_authenticated:
+        date_before_week = datetime.date.today()-datetime.timedelta(days=7)
         for post in Post.objects.all():
             try:
                 if post.views_for_algo >= (post.views * 15) / 100:
@@ -92,15 +94,11 @@ def discover(request):
                 rank = 0.0
             Post.objects.select_for_update().filter(id=post.id).update(rank=rank)
         
-        posts = Post.objects.all().order_by('-rank')[:20]
-        expected_views = Profile.objects.count() * 10 / 100
-        i = 0
-        for post in posts:
-            if post.views_for_algo > 1 and post.views >= expected_views:
-                print(i)
-                i += 1
         
-        ctx = {'posts': posts, 'expected_views': expected_views}
+        print(date_before_week)
+        posts = Post.objects.filter(created_at__gte=date_before_week).order_by('-rank')[:20]
+
+        ctx = {'posts': posts}
         return render(request, 'index/discover.html', ctx)
     else:
         messages.error(request, 'please sign in to view this page')
