@@ -94,6 +94,11 @@ def discover(request):
         
         posts = Post.objects.all().order_by('-rank')[:20]
         expected_views = Profile.objects.count() * 10 / 100
+        i = 0
+        for post in posts:
+            if post.views_for_algo > 1 and post.views >= expected_views:
+                print(i)
+                i += 1
         
         ctx = {'posts': posts, 'expected_views': expected_views}
         return render(request, 'index/discover.html', ctx)

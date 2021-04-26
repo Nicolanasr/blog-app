@@ -8,7 +8,8 @@
 {% block body %}
 
 <div class="container">
-
+    <h1>Most popular posts of the week</h1>
+    <small>This page shows the most popular 20 posts of the week    </small>
     {% for post in posts %}
     {% if post.views_for_algo > 1 and post.views >= expected_views %}
         <a href="{% if post.shared %}{% url 'index:post_details' post.shared_post_id %}{% else %}{% url 'index:post_details' post.id %}{% endif %}" style="text-decoration:none; color:black !important;" class="post">
