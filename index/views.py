@@ -310,3 +310,42 @@ def post_comment(request, post_id):
     else:
         messages.error(request, 'Oops, something went wrong!')
         return redirect('index:index')
+
+
+def search_form(request):
+    query = request.GET.get('query')
+    return redirect('index:search', query)
+
+
+def search(request, query):
+    found = []
+    results_dic = {'profiles': [], "post_title": [], "post_content": []}
+
+    try:
+        user = User.objects.filter(username__icontains=query)
+        for u in user:
+            profile = Profile.objects.filter(user=u)
+            found.append(profile[0])
+            results_dic['profiles'].append(profile[0])
+    except User.DoesNotExist:
+        profile = ""
+
+    try:
+        post = Post.objects.filter(title__icontains=query)
+    except:
+        post = ""
+    
+    for p in post:
+        found.append(p)
+        results_dic['post_title'].append(p)
+
+    try:
+        post_content = Post.objects.filter(content__icontains=query)
+    except:
+        post = ""
+    
+    for p in post_content:
+        results_dic['post_content'].append(p)
+
+    ctx =  {'found': found, 'results_dic': results_dic, 'query': query}
+    return render(request, 'index/search_res.html', ctx)

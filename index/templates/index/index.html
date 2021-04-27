@@ -24,9 +24,18 @@
 
 <div class="row px-5">
   <div class="leftcolumn">
-    <div>
+    <div class="d-flex justify-content-between align-items-end">
       <a class="btn btn-primary mt-2" href="{% url 'index:new_post' %}">Write a new post <i
           class="fas fa-feather-alt"></i></a>
+      <form class="d-flex flex-column mt-3" method="GET" action="{% url 'index:search_form' %}">
+        <div class="d-flex">
+          <input class="form-control me-2" type="search" placeholder="Search" name="query" aria-label="Search">
+          <button class="btn btn-outline-success" type="submit">Search</button>
+        </div>
+        <div id="passwordHelpBlock" class="form-text">
+          You can search for anything (names, posts titles, content)
+        </div>
+      </form>
     </div>
     {% for post in posts %}
     <a href="{% if post.shared %}{% url 'index:post_details' post.shared_post_id %}{% else %}{% url 'index:post_details' post.id %}{% endif %}"

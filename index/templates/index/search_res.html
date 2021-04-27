@@ -1,0 +1,44 @@
+{% extends 'index/base.html' %}
+{% load markdown_extras %}
+{% load static %}
+{% block title %} Search {% endblock %}
+{% block add_link %}<link rel="stylesheet" href="{% static 'css/feed_page.css' %}">{% endblock %}
+
+
+{% block body %}
+
+
+<div class="container">
+    <h1>This is what we found for your search "{{ query }}": <hr></h1>
+    {% for k, v in results_dic.items %}
+        {% if k == "profiles" %}
+            <h3>Profiles:</h3>
+            {% if v|length == 0 %}No results were found{% endif %}
+            {% for profile in v %}
+                <a href="{% url 'index:user_profile' profile %}">{{ profile }}</a>
+            {% endfor %}
+        {% elif k == "post_title" %}
+        <br> <h3>From posts title:</h3>
+            {% if v|length == 0 %}No results were found{% endif %}
+            {% for post in v %}
+                <a href="{% url 'index:post_details' post.id %}">{{ post }}</a> {% if forloop.counter < v|length %} - {% endif %}
+            {% endfor %}
+        {% elif k == "post_content" %}
+        <br> <h3>from posts content:</h3>
+            {% if v|length == 0 %}No results were found{% endif %}
+            <ul>
+                {% for post in v %}
+                    <li>
+                        <a href="{% url 'index:post_details' post.id %}">{{ post }}</a>
+                        <p>
+                            {{ post.content|get_word:query|safe }}
+                        </p>
+                    </li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endfor %}
+</div>
+
+
+{% endblock %}
