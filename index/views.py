@@ -80,8 +80,13 @@ def index(request):
         return redirect('authentication:login')
 
 
-# To display the most popular posts based on posts views / likes algorithm
 def discover(request):
+    tags = Tags.objects.all()
+    return render(request, 'index/discover.html', {'tags': tags})
+
+
+# To display the most popular posts based on posts views / likes algorithm
+def popular(request):
     if request.user.is_authenticated:
         date_before_week = datetime.date.today()-datetime.timedelta(days=7)
         for post in Post.objects.all():
@@ -99,10 +104,23 @@ def discover(request):
         posts = Post.objects.filter(created_at__gte=date_before_week).order_by('-rank')[:20]
 
         ctx = {'posts': posts}
-        return render(request, 'index/discover.html', ctx)
+        return render(request, 'index/popular.html', ctx)
     else:
         messages.error(request, 'please sign in to view this page')
         return redirect('index:index')
+
+
+def discover_tags(request, tag):
+    try:
+        tag = Tags.objects.get(tag_name=tag)
+    except Tags.DoesNotExist:
+        messages.error(request, "Tag couldn't be found")
+        return redirect('index:discover')
+    
+    posts = Post.objects.filter(tags=tag)
+
+    ctx = {'tag': tag, 'posts': posts}
+    return render(request, 'index/discover_tags.html', ctx)
 
 
 def post_details(request, post_id):

@@ -5,7 +5,9 @@ app_name = 'index'
 
 urlpatterns = [
     path('', views.index, name="index"),
-    path('discover/', views.discover, name="discover"),
+    path('discover', views.discover, name="discover"),
+    path('discover/popular', views.popular, name="popular"),
+    path('discover/tags/<str:tag>', views.discover_tags, name="discover_tags"),
     path('post/<int:post_id>', views.post_details, name="post_details"),
     path('new_post/', views.new_post, name="new_post"),
     path('like/<int:post_id>', views.post_like, name="post_like"),

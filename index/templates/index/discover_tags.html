@@ -1,0 +1,32 @@
+{% extends 'index/base.html' %}
+{% load markdown_extras %}
+{% load static %}
+{% block title %} Search {% endblock %}
+{% block add_link %}<link rel="stylesheet" href="{% static 'css/feed_page.css' %}">{% endblock %}
+{% block body %}
+
+
+<div class="container">
+    <h1>Results for: "{{tag}}"</h1>
+    {% for post in posts %}
+        <a href="{% if post.shared %}{% url 'index:post_details' post.shared_post_id %}{% else %}{% url 'index:post_details' post.id %}{% endif %}"
+        style="text-decoration:none; color:black !important;" class="post">
+        <div class="card">
+            {% if post.shared %}
+            <p class="badge bg-secondary" style="width:75px;">Shared</p>
+            {% endif %}
+            <h2 class="pb-0 mb-0">{{ post.title }}</h2>
+            <div class="text-muted mb-1" style="font-size: 15px"><span class="text-muted">by</span> <a
+                href="{% url 'index:user_profile' post.author %}">{{post.author}}</a>-{{ post.created_at }}
+            {% if post.shared %}
+            (Shared by: <a href="{% url 'index:user_profile' post.shared_by %}">{{ post.shared_by }}</a>)
+            {% endif %}
+            </div>
+            <div><img height="200px" src="{{ post.thumbnail }}" alt="thumbnail unavailable"></div>
+            <p>{{ post.content| markdown | safe | truncatewords:20}}</p>
+        </div>
+        </a>
+    {% endfor %}
+</div>
+
+{% endblock %}

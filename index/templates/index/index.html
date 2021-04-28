@@ -29,7 +29,7 @@
           class="fas fa-feather-alt"></i></a>
       <form class="d-flex flex-column mt-3" method="GET" action="{% url 'index:search_form' %}">
         <div class="d-flex">
-          <input class="form-control me-2" type="search" placeholder="Search" name="query" aria-label="Search">
+          <input class="form-control me-2" type="search" placeholder="Search" name="query" aria-label="Search" required>
           <button class="btn btn-outline-success" type="submit">Search</button>
         </div>
         <div id="passwordHelpBlock" class="form-text">
@@ -65,7 +65,7 @@
       <p>Some text about me in culpa qui officia deserunt mollit anim..</p>
     </div>
     <div class="card">
-    <h3><a href="{% url 'index:discover' %}">Popular posts</a></h3>
+    <h3><a href="{% url 'index:popular' %}">Popular posts</a></h3>
       {% for post in popular_posts %}
       {% if post.views_for_algo > 1 and post.views >= expected_views %}
       <a href="{% if post.shared %}{% url 'index:post_details' post.shared_post_id %}{% else %}{% url 'index:post_details' post.id %}{% endif %}"
