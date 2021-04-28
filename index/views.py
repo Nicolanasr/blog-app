@@ -112,7 +112,7 @@ def popular(request):
 
 def discover_tags(request, tag):
     try:
-        tag = Tags.objects.get(tag_name=tag)
+        tag = Tags.objects.get(tag_name__iexact=tag)
     except Tags.DoesNotExist:
         messages.error(request, "Tag couldn't be found")
         return redirect('index:discover')

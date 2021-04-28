@@ -29,7 +29,7 @@
     {% endif %}
     <br>
     {% for tags in post.tags.all %}
-        <small class="badge bg-secondary" >{{ tags }}</small>
+        <a href="{% url 'index:discover_tags' tags %}" ><small class="badge bg-secondary" >{{ tags }}</small></a>
     {% endfor %}
     <div class="mt-3"><img width="100%" src="{{ post.thumbnail }}" alt="thumbnail unavailable"></div>
     <p>{{ post.content| markdown | safe }}</p>
