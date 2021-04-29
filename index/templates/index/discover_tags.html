@@ -8,7 +8,9 @@
 
 <div class="container">
     <h1>Results for: "{{tag}}"</h1>
+    <div class="infinite-container">
     {% for post in posts %}
+    <div class="infinite-item">
         <a href="{% if post.shared %}{% url 'index:post_details' post.shared_post_id %}{% else %}{% url 'index:post_details' post.id %}{% endif %}"
         style="text-decoration:none; color:black !important;" class="post">
         <div class="card">
@@ -26,7 +28,45 @@
             <p>{{ post.content| markdown | safe | truncatewords:20}}</p>
         </div>
         </a>
+    </div>
     {% endfor %}
+    </div>
 </div>
+
+
+ <!-- <div class="infinite-container">
+  {% for post in posts %}
+    <div class="infinite-item">{{ post }}</div> <br><br>
+  {% endfor %}
+</div> -->
+
+
+{% if posts.has_next %}
+<a class="infinite-more-link" href="?page={{ posts.next_page_number }}"></a>
+{% endif %}
+
+
+<div class="loading" style="display: none; position: fixed;left:45%; top:40%;; z-index: 999;">
+  <div class="spinner-border" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+</div>
+
+<div class="footer">
+  <h2>Footer</h2>
+</div> 
+
+<script>
+  var infinite = new Waypoint.Infinite({
+    element: $('.infinite-container')[0],
+    onBeforePageLoad: function () {
+      $('.loading').show();
+    },
+    onAfterPageLoad: function ($items) {
+      $('.loading').hide();
+    }
+  });
+</script>
+
 
 {% endblock %}

@@ -21,7 +21,6 @@
   <h2>Blog Name</h2>
 </div>
 
-
 <div class="row px-5">
   <div class="leftcolumn">
     <div class="d-flex justify-content-between align-items-end">
@@ -37,25 +36,30 @@
         </div>
       </form>
     </div>
-    {% for post in posts %}
-    <a href="{% if post.shared %}{% url 'index:post_details' post.shared_post_id %}{% else %}{% url 'index:post_details' post.id %}{% endif %}"
-      style="text-decoration:none; color:black !important;" class="post">
-      <div class="card">
-        {% if post.shared %}
-        <p class="badge bg-secondary" style="width:75px;">Shared</p>
-        {% endif %}
-        <h2 class="pb-0 mb-0">{{ post.title }}</h2>
-        <div class="text-muted mb-1" style="font-size: 15px"><span class="text-muted">by</span> <a
-            href="{% url 'index:user_profile' post.author %}">{{post.author}}</a>-{{ post.created_at }}
-          {% if post.shared %}
-          (Shared by: <a href="{% url 'index:user_profile' post.shared_by %}">{{ post.shared_by }}</a>)
-          {% endif %}
-        </div>
-        <div><img height="200px" src="{{ post.thumbnail }}" alt="thumbnail unavailable"></div>
-        <p>{{ post.content| markdown | safe | truncatewords:20}}</p>
+    
+    <div class="infinite-container">
+      {% for post in posts %}
+      <div class="infinite-item">
+        <a href="{% if post.shared %}{% url 'index:post_details' post.shared_post_id %}{% else %}{% url 'index:post_details' post.id %}{% endif %}"
+          style="text-decoration:none; color:black !important;" class="post">
+          <div class="card">
+            {% if post.shared %}
+            <p class="badge bg-secondary" style="width:75px;">Shared</p>
+            {% endif %}
+            <h2 class="pb-0 mb-0">{{ post.title }}</h2>
+            <div class="text-muted mb-1" style="font-size: 15px"><span class="text-muted">by</span> <a
+                href="{% url 'index:user_profile' post.author %}">{{post.author}}</a>-{{ post.created_at }}
+              {% if post.shared %}
+              (Shared by: <a href="{% url 'index:user_profile' post.shared_by %}">{{ post.shared_by }}</a>)
+              {% endif %}
+            </div>
+            <div><img height="200px" src="{{ post.thumbnail }}" alt="thumbnail unavailable"></div>
+            <p>{{ post.content| markdown | safe | truncatewords:20}}</p>
+          </div>
+        </a>
       </div>
-    </a>
-    {% endfor %}
+      {% endfor %}
+    </div>
   </div>
   <div class="rightcolumn">
     <div class="card">
@@ -95,8 +99,38 @@
   </div>
 </div>
 
+ <!-- <div class="infinite-container">
+  {% for post in posts %}
+    <div class="infinite-item">{{ post }}</div> <br><br>
+  {% endfor %}
+</div> -->
+
+
+{% if posts.has_next %}
+<a class="infinite-more-link" href="?page={{ posts.next_page_number }}"></a>
+{% endif %}
+
+
+<div class="loading" style="display: none; position: fixed;left:45%; top:40%;; z-index: 999;">
+  <div class="spinner-border" role="status">
+    <span class="visually-hidden">Loading...</span>
+  </div>
+</div>
+
 <div class="footer">
   <h2>Footer</h2>
-</div>
+</div> 
+
+<script>
+  var infinite = new Waypoint.Infinite({
+    element: $('.infinite-container')[0],
+    onBeforePageLoad: function () {
+      $('.loading').show();
+    },
+    onAfterPageLoad: function ($items) {
+      $('.loading').hide();
+    }
+  });
+</script>
 
 {% endblock %}

@@ -77,8 +77,16 @@ def index(request):
             elif post.shared == True and post.shared_by in following:  # To also add shared posts by profiles he follows
                 posts_of_following.append(post)
 
-
-        ctx = {'posts': posts_of_following, 'popular_posts': popular_posts, 'expected_views': expected_views}
+        page = request.GET.get('page', 1)
+        paginator = Paginator(posts_of_following, 15)
+        try:
+            posts = paginator.page(page)
+        except PageNotAnInteger:
+            posts = paginator.page(1)
+        except EmptyPage:
+            posts = paginator.page(paginator.num_pages)
+        
+        ctx = {'posts': posts, 'popular_posts': popular_posts, 'expected_views': expected_views}
         return render(request, 'index/index.html', ctx)
     else:
         return redirect('authentication:login')
@@ -122,6 +130,14 @@ def discover_tags(request, tag):
         return redirect('index:discover')
     
     posts = Post.objects.filter(tags=tag)
+    page = request.GET.get('page', 1)
+    paginator = Paginator(posts, 15)
+    try:
+        posts = paginator.page(page)
+    except PageNotAnInteger:
+        posts = paginator.page(1)
+    except EmptyPage:
+        posts = paginator.page(paginator.num_pages)
 
     ctx = {'tag': tag, 'posts': posts}
     return render(request, 'index/discover_tags.html', ctx)
@@ -131,6 +147,15 @@ def discover_tags(request, tag):
 def newly_posted(request):
     posts = Post.objects.all().order_by('-created_at')
 
+    page = request.GET.get('page', 1)
+    paginator = Paginator(posts, 15)
+    try:
+        posts = paginator.page(page)
+    except PageNotAnInteger:
+        posts = paginator.page(1)
+    except EmptyPage:
+        posts = paginator.page(paginator.num_pages)
+
     return render(request, 'index/newly_posted.html', {'posts': posts})
 
 
@@ -138,6 +163,16 @@ def most_liked(request):
     date_before_week = datetime.date.today()-datetime.timedelta(days=7)
 
     posts = Post.objects.filter(created_at__gte=date_before_week).order_by('-likes')[:50]
+
+    page = request.GET.get('page', 1)
+    paginator = Paginator(posts, 15)
+    try:
+        posts = paginator.page(page)
+    except PageNotAnInteger:
+        posts = paginator.page(1)
+    except EmptyPage:
+        posts = paginator.page(paginator.num_pages)
+
 
     return render(request, 'index/most_liked.html', {'posts': posts})
 
