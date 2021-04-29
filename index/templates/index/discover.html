@@ -1,7 +1,7 @@
 {% extends 'index/base.html' %}
 {% load markdown_extras %}
 {% load static %}
-{% block title %} Search {% endblock %}
+{% block title %} Discover {% endblock %}
 {% block add_link %}<link rel="stylesheet" href="{% static 'css/feed_page.css' %}">{% endblock %}
 
 
@@ -12,20 +12,29 @@
 {% endfor %}
 
 <div class="container">
-    <a href="{% url 'index:popular' %}">Most popular posts of the week</a>
-    <div>
-        Search by tags
-        <div class="btn-group">
-            <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-                Select a tag
-            </button>
-            <ul class="dropdown-menu">
-                {% for tag in tags %}
-                        <li><a class="dropdown-item" href="{% url 'index:discover_tags' tag.tag_name %}">{{ tag }}</a></li>
-                {% endfor %}
-            </ul>
-        </div>
-    </div>
+    <h2>Discover posts:</h2>
+    <ul>
+        <li><a href="{% url 'index:popular' %}">Most popular posts of the week</a></li>
+        <li><div>
+            Search by tags
+            <div class="btn-group">
+                <button type="button" class="btn btn-secondary dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+                    Select a tag
+                </button>
+                <ul class="dropdown-menu">
+                    {% for tag in tags %}
+                            <li><a class="dropdown-item" href="{% url 'index:discover_tags' tag.tag_name %}">{{ tag }}</a></li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div></li>
+        <li><a href="{% url 'index:newly_posted' %}">Newly posted</a></li>
+        <li><a href="{% url 'index:most_liked' %}">Most liked posts of the week</a></li>
+    </ul>
+    <h2>Discover people</h2>
+    <ul>
+        <li><a href="{% url 'index:random_profile' %}">Give me a random profile to follow</a></li>
+    </ul>
 </div>
 
 

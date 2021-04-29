@@ -4,6 +4,7 @@ from .models import Tags, Post, Comments, LikesUsers, User, ViewedPost
 from authentication.models import Profile, FollowModel
 from django.shortcuts import get_list_or_404, get_object_or_404
 from django.contrib import messages
+from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 import random
 import datetime
 
@@ -55,8 +56,10 @@ def index(request):
             except:
                 rank = 0.0
             Post.objects.select_for_update().filter(id=post.id).update(rank=rank)
+
+        date_before_week = datetime.date.today()-datetime.timedelta(days=7)
         
-        popular_posts = Post.objects.all().order_by('-rank')[:3]
+        popular_posts = Post.objects.filter(created_at__gte=date_before_week).order_by('-rank')[:4]
         expected_views = Profile.objects.count() * 10 / 100
         
         posts = Post.objects.all()
@@ -73,6 +76,7 @@ def index(request):
                 posts_of_following.append(post)
             elif post.shared == True and post.shared_by in following:  # To also add shared posts by profiles he follows
                 posts_of_following.append(post)
+
 
         ctx = {'posts': posts_of_following, 'popular_posts': popular_posts, 'expected_views': expected_views}
         return render(request, 'index/index.html', ctx)
@@ -100,10 +104,10 @@ def popular(request):
             Post.objects.select_for_update().filter(id=post.id).update(rank=rank)
         
         
-        print(date_before_week)
         posts = Post.objects.filter(created_at__gte=date_before_week).order_by('-rank')[:20]
+        expected_views = Profile.objects.count() * 10 / 100
 
-        ctx = {'posts': posts}
+        ctx = {'posts': posts, 'expected_views': expected_views}
         return render(request, 'index/popular.html', ctx)
     else:
         messages.error(request, 'please sign in to view this page')
@@ -121,6 +125,32 @@ def discover_tags(request, tag):
 
     ctx = {'tag': tag, 'posts': posts}
     return render(request, 'index/discover_tags.html', ctx)
+
+
+# Get the latest posted posts
+def newly_posted(request):
+    posts = Post.objects.all().order_by('-created_at')
+
+    return render(request, 'index/newly_posted.html', {'posts': posts})
+
+
+def most_liked(request):
+    date_before_week = datetime.date.today()-datetime.timedelta(days=7)
+
+    posts = Post.objects.filter(created_at__gte=date_before_week).order_by('-likes')[:50]
+
+    return render(request, 'index/most_liked.html', {'posts': posts})
+
+
+def random_profile(request):
+    current_profile = Profile.objects.get(user=request.user)
+    random_profile = current_profile
+
+    profiles = Profile.objects.all()
+    while random_profile is current_profile:
+        random_profile = random.choice(profiles)
+    
+    return redirect('index:user_profile', random_profile)
 
 
 def post_details(request, post_id):
