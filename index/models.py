@@ -38,10 +38,16 @@ class Post(models.Model):
 # To check if a user has already likes a post
 class LikesUsers(models.Model):
     def __str__(self):
-        if self.value == 1:
-            return f'{self.post}-{self.user.user.username}-like'
-        elif self.value == -1:
-            return f'{self.post}-{self.user.user.username}-dislike'
+        try:
+            if self.value == 1:
+                return f'{self.post}-{self.user.user.username}-like'
+            elif self.value == -1:
+                return f'{self.post}-{self.user.user.username}-dislike'
+        except:
+            if self.value == 1:
+                return 'User deleted-like'
+            elif self.value == -1:
+                return 'User deleted-dislike'
 
     choice = (
         (1, "like"),

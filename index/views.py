@@ -182,8 +182,18 @@ def random_profile(request):
     random_profile = current_profile
 
     profiles = Profile.objects.all()
-    while random_profile is current_profile:
+    
+    # Making sure the user is not following the random profile given
+    while True:
         random_profile = random.choice(profiles)
+
+        if random_profile in FollowModel.objects.get(follower=current_profile).following.all() or random_profile is current_profile:
+            continue
+        else:
+            break
+
+        if random_profile is not current_profile:
+            break
     
     return redirect('index:user_profile', random_profile)
 
